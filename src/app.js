@@ -1,24 +1,25 @@
 import * as yup from 'yup';
 import view from './view.js';
 
-export default async () => {
+export default async (i18nInstance) => {
   const state = {
     rssForm: {
       state: 'intial',
       validate: true,
       links: [],
-      errors: {},
+      error: '',
+      successMessage: i18nInstance.t('success'),
     },
   };
   const watchedState = view(state);
 
   yup.setLocale({
     mixed: {
-      notOneOf: 'duplicate',
+      notOneOf: i18nInstance.t('duplicate'),
       required: 'required',
     },
     string: {
-      url: 'invalidURL',
+      url: i18nInstance.t('invalidUrl'),
     },
   });
 
@@ -38,7 +39,7 @@ export default async () => {
         e.target.elements.url.focus();
       })
       .catch((err) => {
-        watchedState.rssForm.errors = err.message;
+        watchedState.rssForm.error = err.message;
         watchedState.rssForm.validate = false;
         watchedState.rssForm.state = 'invalid';
       });
