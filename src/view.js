@@ -7,7 +7,6 @@ export default (state) => {
   };
 
   const watchedState = onChange(state, (path, value) => {
-    console.log(path, value);
     if (path === 'rssForm.state') {
       if (value === 'invalid') {
         elements.input.classList.add('is-invalid');

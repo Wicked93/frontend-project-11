@@ -1,17 +1,28 @@
 import * as yup from 'yup';
 import view from './view.js';
+import parse from './parser.js';
+
+const setIds = (data) => {
+  const id = Date.now();
+  const { title, description } = data.feed;
+  const feed = { id, title, description };
+  const posts = data.posts.map((post) => ({ id, ...post }));
+  return { feed, posts };
+};
 
 export default async (i18nInstance) => {
-  const state = {
+  const intialState = {
     rssForm: {
       state: 'intial',
       validate: true,
       links: [],
       error: '',
       successMessage: i18nInstance.t('success'),
+      feeds: [],
+      posts: [],
     },
   };
-  const watchedState = view(state);
+  const state = view(intialState);
 
   yup.setLocale({
     mixed: {
@@ -30,18 +41,31 @@ export default async (i18nInstance) => {
     e.preventDefault();
     const inputURL = (e.target.elements.url.value).trim();
 
-    schema.notOneOf(watchedState.rssForm.links).validate(inputURL)
+    schema.notOneOf(state.rssForm.links).validate(inputURL)
       .then(() => {
-        watchedState.rssForm.validate = true;
-        watchedState.rssForm.links.push(inputURL);
-        watchedState.rssForm.state = 'valid';
+        state.rssForm.validate = true;
+        state.rssForm.links.push(inputURL);
+        state.rssForm.state = 'valid';
         e.target.reset();
         e.target.elements.url.focus();
+        Promise.resolve(fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(inputURL)}`)
+          .then((response) => {
+            if (response.ok) return response.json();
+            throw new Error('Network response was not ok.');
+          })
+          .then((data) => data.contents)
+          .then((content) => parse(content))
+          .then((parsedData) => setIds(parsedData))
+          .then((normalizedData) => {
+            state.rssForm.feeds.push(normalizedData.feed);
+            state.rssForm.posts.push(...normalizedData.posts);
+          })
+          .then(() => console.log(state)));
       })
       .catch((err) => {
-        watchedState.rssForm.error = err.message;
-        watchedState.rssForm.validate = false;
-        watchedState.rssForm.state = 'invalid';
+        state.rssForm.error = err.message;
+        state.rssForm.validate = false;
+        state.rssForm.state = 'invalid';
       });
   });
 };
