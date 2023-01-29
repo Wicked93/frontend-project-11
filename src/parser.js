@@ -3,9 +3,9 @@ const parseToHTML = (data) => {
   const parsedData = parser.parseFromString(data, 'application/xml');
   const errorNode = parsedData.querySelector('parsererror');
   if (errorNode) throw new Error("It doesn't have valid RSS");
-    return parsedData;
+  return parsedData;
 };
-  
+
 const getFeed = (parsedData) => {
   const titleEl = parsedData.querySelector('channel title');
   const title = titleEl.textContent;
@@ -13,7 +13,7 @@ const getFeed = (parsedData) => {
   const description = descriptionEl.textContent;
   return { title, description };
 };
-  
+
 const getPosts = (parsedData) => {
   const items = parsedData.querySelectorAll('item');
   return [...items].map((item) => {

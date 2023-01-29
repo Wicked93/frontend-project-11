@@ -16,17 +16,23 @@ const renderPosts = (state, elements) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'aling-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
+    if (state.readPosts.includes(post.id)) {
+      a.classList.add('fw-normal');
+    } else {
+      a.classList.add('fw-bold');
+    }
     a.setAttribute('href', post.link);
-    a.classList.add('fw-bold');
     a.setAttribute('target', '_blank');
     a.setAttribute('rel', 'noopener noreferrer');
     a.textContent = post.title;
+    a.dataset.id = post.id;
     const button = document.createElement('button');
     button.setAttribute('type', 'button');
     button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+    button.dataset.id = post.id;
     button.dataset.bsToggle = 'modal';
     button.dataset.bsTarget = '#modal';
-    button.textContent = 'Просмотр';
+    button.textContent = 'View';
     li.append(a, button);
     return li;
   });
@@ -70,9 +76,19 @@ export default (state, i18nInstance) => {
     outputText: document.querySelector('.feedback'),
     posts: document.querySelector('.posts'),
     feeds: document.querySelector('.feeds'),
+    modalTitle: document.querySelector('.modal-title'),
+    modalBody: document.querySelector('.modal-body'),
+    modalLink: document.querySelector('.modal a'),
   };
 
   const watchedState = onChange(state, (path, value) => {
+    if (path === 'modalPost') {
+      const post = state.posts.filter((item) => item.id === value)[0];
+      elements.modalTitle.textContent = post.title;
+      elements.modalBody.textContent = post.description;
+      elements.modalLink.setAttribute('href', post.link);
+      watchedState.state = 'loading';
+    }
     if (path === 'state') {
       if (value === 'failed') {
         elements.input.classList.add('is-invalid');
@@ -81,7 +97,7 @@ export default (state, i18nInstance) => {
         elements.outputText.classList.remove('text-success');
         elements.outputText.classList.add('text-danger');
       }
-      if (value === 'valid') {
+      if (value === 'loading') {
         elements.input.classList.remove('is-invalid');
         watchedState.state = 'rendered';
         elements.outputText.textContent = i18nInstance.t('success');
