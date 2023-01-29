@@ -15,7 +15,6 @@ export default async (lang = 'ru') => {
   const i18nextInstance = i18next.createInstance();
   Promise.resolve(i18nextInstance.init({
     lng: lang,
-    debug: true,
     resources,
   }));
   app(i18nextInstance);

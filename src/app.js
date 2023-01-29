@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import * as yup from 'yup';
 import view from './view.js';
 import parse from './parser.js';
@@ -10,19 +11,23 @@ const setIds = (data) => {
   return { feed, posts };
 };
 
+const getFeedsPostsFromURL = (url) => fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
+  .then((response) => response.json())
+  .then((responseData) => parse(responseData.contents))
+  .then((parsedData) => setIds(parsedData))
+  .catch((err) => {
+    throw new Error(err.message);
+  });
+
 export default async (i18nInstance) => {
   const intialState = {
-    rssForm: {
-      state: 'intial',
-      validate: true,
-      links: [],
-      error: '',
-      successMessage: i18nInstance.t('success'),
-      feeds: [],
-      posts: [],
-    },
+    state: 'intial',
+    error: '',
+    links: [],
+    feeds: [],
+    posts: [],
   };
-  const state = view(intialState);
+  const state = view(intialState, i18nInstance);
 
   yup.setLocale({
     mixed: {
@@ -41,31 +46,51 @@ export default async (i18nInstance) => {
     e.preventDefault();
     const inputURL = (e.target.elements.url.value).trim();
 
-    schema.notOneOf(state.rssForm.links).validate(inputURL)
+    schema.notOneOf(state.links).validate(inputURL)
       .then(() => {
-        state.rssForm.validate = true;
-        state.rssForm.links.push(inputURL);
-        state.rssForm.state = 'valid';
         e.target.reset();
         e.target.elements.url.focus();
-        Promise.resolve(fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(inputURL)}`)
-          .then((response) => {
-            if (response.ok) return response.json();
-            throw new Error('Network response was not ok.');
-          })
-          .then((data) => data.contents)
-          .then((content) => parse(content))
-          .then((parsedData) => setIds(parsedData))
-          .then((normalizedData) => {
-            state.rssForm.feeds.push(normalizedData.feed);
-            state.rssForm.posts.push(...normalizedData.posts);
-          })
-          .then(() => console.log(state)));
+      })
+      .then(() => getFeedsPostsFromURL(inputURL))
+      .then((normalizedData) => {
+        state.feeds.unshift(normalizedData.feed);
+        state.posts.unshift(...normalizedData.posts);
+        state.links.unshift(inputURL);
+        state.state = 'valid';
       })
       .catch((err) => {
-        state.rssForm.error = err.message;
-        state.rssForm.validate = false;
-        state.rssForm.state = 'invalid';
+        state.error = err.message;
+        state.state = 'failed';
       });
   });
+
+  const checkForNewPosts = () => {
+    const run = () => {
+      const promises = state.links
+        .map((link, index) => getFeedsPostsFromURL(link)
+          .then((response) => {
+            const { id } = state.feeds[index];
+            const filteredPosts = state.posts.filter((post) => post.id === id);
+            const currentNewPosts = _.differenceBy(response.posts, filteredPosts, 'title')
+              .map((post) => {
+                const newPost = post;
+                newPost.id = id;
+                return newPost;
+              });
+            if (currentNewPosts.length > 0) {
+              state.posts.unshift(...currentNewPosts);
+              state.state = 'valid';
+            }
+          })
+          .catch((err) => {
+            state.error = err.message;
+            state.state = 'failed';
+            throw new Error(err.message);
+          }));
+      Promise.all(promises).finally(() => setTimeout(run, 5000));
+    };
+    setTimeout(run, 5000);
+  };
+
+  checkForNewPosts();
 };
