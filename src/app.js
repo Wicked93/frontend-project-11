@@ -1,3 +1,5 @@
+import i18next from 'i18next';
+import ru from './locales/ru.js';
 import _ from 'lodash';
 import * as yup from 'yup';
 import view from './view.js';
@@ -29,15 +31,22 @@ export default async (i18nInstance) => {
     readPosts: [],
     modalPost: '',
   };
+
+  const i18nextInstance = i18next.createInstance();
+  i18nextInstance.init({
+    lng: 'ru',
+    resources: { ru },
+  });
+
   const state = view(intialState, i18nInstance);
 
   yup.setLocale({
     mixed: {
-      notOneOf: i18nInstance.t('duplicate'),
+      notOneOf: 'duplicate',
       required: 'required',
     },
     string: {
-      url: i18nInstance.t('invalidUrl'),
+      url: 'invalidUrl',
     },
   });
 
