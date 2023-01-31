@@ -15,10 +15,13 @@ const setIds = (data) => {
 
 const getFeedsPostsFromURL = (url) => fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
   .then((response) => response.json())
-  .then((responseData) => parse(responseData.contents))
-  .then((parsedData) => setIds(parsedData))
   .catch(() => {
     throw new Error('Network error');
+  })
+  .then((responseData) => parse(responseData.contents))
+  .then((parsedData) => setIds(parsedData))
+  .catch((e) => {
+    throw new Error(e.message);
   });
 
 export default async (i18nInstance) => {
@@ -91,11 +94,7 @@ export default async (i18nInstance) => {
             const { feedId } = state.feeds[index];
             const filteredPosts = state.posts.filter((post) => post.feedId === feedId);
             const currentNewPosts = _.differenceBy(response.posts, filteredPosts, 'title')
-              .map((post) => {
-                const newPost = post;
-                newPost.feedId = feedId;
-                return newPost;
-              });
+            .map((post) => ({ feedId, id: _.uniqueId, ...post }));
             if (currentNewPosts.length > 0) {
               state.posts.unshift(...currentNewPosts);
               state.state = 'loading';
