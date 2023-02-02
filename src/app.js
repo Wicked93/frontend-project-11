@@ -4,27 +4,46 @@ import _ from 'lodash';
 import * as yup from 'yup';
 import view from './view.js';
 import parse from './parser.js';
+import axios from 'axios';
 
 const setIds = (data) => {
-  const feedId = Date.now();
+  const feedId = _.uniqueId();
   const { title, description } = data.feed;
   const feed = { feedId, title, description };
   const posts = data.posts.map((post) => ({ feedId, id: _.uniqueId(), ...post }));
   return { feed, posts };
 };
 
-const getFeedsPostsFromURL = (url) => fetch(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
-  .then((response) => response.json())
+const generateURL = (link) => {
+  const url = new URL('https://allorigins.hexlet.app/get');
+  url.searchParams.append('disableCache', 'true');
+  url.searchParams.append('url', link);
+  return url;
+};
+
+const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
   .catch(() => {
     throw new Error('Network error');
   })
-  .then((responseData) => parse(responseData.contents))
-  .then((parsedData) => setIds(parsedData))
+  .then((response) => {
+    const parsedData = parse(response.data.contents);
+    return setIds(parsedData);
+  })
   .catch((e) => {
     throw new Error(e.message);
   });
 
-export default async (i18nInstance) => {
+  export default () => {
+    const createi18nextInstance = (lng = 'ru') => {
+      const i18nextInstance = i18next.createInstance();
+      Promise.resolve(i18nextInstance.init({
+        lng,
+        resources: { ru },
+      }));
+      return i18nextInstance;
+    };
+    i18nextInstance = createi18nextInstance();
+  
   const intialState = {
     state: 'intial',
     error: '',
@@ -41,7 +60,7 @@ export default async (i18nInstance) => {
     resources: { ru },
   });
 
-  const state = view(intialState, i18nInstance);
+  const state = view(intialState, i18nextInstance);
 
   yup.setLocale({
     mixed: {
@@ -97,7 +116,7 @@ export default async (i18nInstance) => {
             .map((post) => ({ feedId, id: _.uniqueId, ...post }));
             if (currentNewPosts.length > 0) {
               state.posts.unshift(...currentNewPosts);
-              state.state = 'loading';
+              state.state = 'loaded';
             }
           })
           .catch((err) => {

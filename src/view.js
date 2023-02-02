@@ -4,6 +4,7 @@ export default (state, i18nInstance) => {
   const elements = {
     input: document.querySelector('#url-input'),
     outputText: document.querySelector('.feedback'),
+    button: document.querySelector('#url-submit-button'),
     posts: document.querySelector('.posts'),
     feeds: document.querySelector('.feeds'),
     modalTitle: document.querySelector('.modal-title'),
@@ -39,7 +40,7 @@ export default (state, i18nInstance) => {
       a.textContent = post.title;
       const button = document.createElement('button');
       button.setAttribute('type', 'button');
-      button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+      button.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'h-100');
       button.dataset.bsToggle = 'modal';
       button.dataset.bsTarget = '#modal';
       button.dataset.id = post.id;
@@ -87,19 +88,25 @@ export default (state, i18nInstance) => {
       elements.modalTitle.textContent = post.title;
       elements.modalBody.textContent = post.description;
       elements.modalLink.setAttribute('href', post.link);
-      watchedState.state = 'loading';
+      watchedState.state = 'loaded';
     }
     if (path === 'state') {
       if (value === 'failed') {
         elements.input.classList.add('is-invalid');
-        watchedState.state = 'rendered';
+        elements.button.classList.remove('disabled');
         elements.outputText.textContent = i18nInstance.t(watchedState.error);
         elements.outputText.classList.remove('text-success');
         elements.outputText.classList.add('text-danger');
       }
       if (value === 'loading') {
-        elements.input.classList.remove('is-invalid');
+        elements.outputText.textContent = '';
+        elements.button.classList.add('disabled');
+        watchedState.error = '';
         watchedState.state = 'rendered';
+      }
+      if (value === 'loaded') {
+        elements.input.classList.remove('is-invalid');
+        elements.button.classList.remove('disabled');
         elements.outputText.textContent = i18nInstance.t('success');
         elements.outputText.classList.remove('text-danger');
         elements.outputText.classList.add('text-success');
@@ -107,6 +114,7 @@ export default (state, i18nInstance) => {
         elements.feeds.innerHTML = '';
         renderPosts(watchedState, elements);
         renderFeeds(watchedState, elements);
+        watchedState.state = 'rendered';
       }
     }
   });
