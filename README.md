@@ -3,10 +3,10 @@
 [![ESLint](https://github.com/Wicked93/frontend-project-11/actions/workflows/ESLint.yml/badge.svg)](https://github.com/Wicked93/frontend-project-11/actions/workflows/ESLint.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f86246cb482e4c257649/maintainability)](https://codeclimate.com/github/Wicked93/frontend-project-11/maintainability)
 
-# [RSS агрегатор](https://frontend-project-11-wicked93.vercel.app)
+# [RSS Р°РіСЂРµРіР°С‚РѕСЂ](https://frontend-project-11-wicked93.vercel.app)
 
-## Описание
-[RSS агрегатор](https://frontend-project-11-wicked93.vercel.app) — сервис для агрегации RSS-потоков, с помощью которых удобно читать разнообразные источники, например, блоги. Он позволяет добавлять неограниченное количество RSS-лент, сам их обновляет и добавляет новые записи в общий поток.
+## РћРїРёСЃР°РЅРёРµ
+[RSS Р°РіСЂРµРіР°С‚РѕСЂ](https://frontend-project-11-wicked93.vercel.app) вЂ” СЃРµСЂРІРёСЃ РґР»СЏ Р°РіСЂРµРіР°С†РёРё RSS-РїРѕС‚РѕРєРѕРІ, СЃ РїРѕРјРѕС‰СЊСЋ РєРѕС‚РѕСЂС‹С… СѓРґРѕР±РЅРѕ С‡РёС‚Р°С‚СЊ СЂР°Р·РЅРѕРѕР±СЂР°Р·РЅС‹Рµ РёСЃС‚РѕС‡РЅРёРєРё, РЅР°РїСЂРёРјРµСЂ, Р±Р»РѕРіРё. РћРЅ РїРѕР·РІРѕР»СЏРµС‚ РґРѕР±Р°РІР»СЏС‚СЊ РЅРµРѕРіСЂР°РЅРёС‡РµРЅРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ RSS-Р»РµРЅС‚, СЃР°Рј РёС… РѕР±РЅРѕРІР»СЏРµС‚ Рё РґРѕР±Р°РІР»СЏРµС‚ РЅРѕРІС‹Рµ Р·Р°РїРёСЃРё РІ РѕР±С‰РёР№ РїРѕС‚РѕРє.
 
-## Превью
+## РџСЂРµРІСЊСЋ
 ![image](RSS_Demo.gif)
