@@ -50,8 +50,8 @@ const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
     links: [],
     feeds: [],
     posts: [],
-    readPosts: [],
-    modalPost: '',
+    readPostsIds: new Set(),
+    modalPost: {},
   };
 
   const i18nextInstance = i18next.createInstance();
@@ -75,7 +75,6 @@ const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
   const schema = yup.string().url().required();
 
   const form = document.querySelector('form.rss-form');
-  const postsContainer = document.querySelector('.posts');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const inputURL = (e.target.elements.url.value).trim();
@@ -90,7 +89,7 @@ const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
         state.feeds.unshift(normalizedData.feed);
         state.posts.unshift(...normalizedData.posts);
         state.links.unshift(inputURL);
-        state.state = 'loading';
+        state.state = 'loaded';
       })
       .catch((err) => {
         state.error = err.message;
@@ -98,36 +97,36 @@ const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
       });
   });
 
+  const postsContainer = document.querySelector('.posts');
   postsContainer.addEventListener('click', (e) => {
     const { id } = e.target.dataset;
     if (!id) return;
-    state.readPosts.push(id);
-    state.modalPost = id;
+    state.readPostsIds.add(id);
+    const { title, description, link } = state.posts.filter((item) => item.id === id)[0];
+    state.modalPost = { title, description, link };
   });
 
   const checkForNewPosts = () => {
-    const run = () => {
-      const promises = state.links
-        .map((link, index) => getFeedsPostsFromURL(link)
-          .then((response) => {
-            const { feedId } = state.feeds[index];
-            const filteredPosts = state.posts.filter((post) => post.feedId === feedId);
-            const currentNewPosts = _.differenceBy(response.posts, filteredPosts, 'title')
+    const promises = state.links
+      .map((link, index) => getFeedsPostsFromURL(link)
+        .then((response) => {
+          const { feedId } = state.feeds[index];
+          const filteredPosts = state.posts.filter((post) => post.feedId === feedId);
+          const currentNewPosts = _.differenceBy(response.posts, filteredPosts, 'title')
             .map((post) => ({ feedId, id: _.uniqueId, ...post }));
-            if (currentNewPosts.length > 0) {
-              state.posts.unshift(...currentNewPosts);
-              state.state = 'loaded';
-            }
-          })
-          .catch((err) => {
-            state.error = err.message;
-            state.state = 'failed';
-            throw new Error(err.message);
-          }));
-      Promise.all(promises).finally(() => setTimeout(run, 5000));
-    };
-    setTimeout(run, 5000);
+          if (currentNewPosts.length > 0) {
+            state.posts.unshift(...currentNewPosts);
+            state.state = 'loaded';
+          }
+        })
+        .catch((err) => {
+          state.error = err.message;
+          state.state = 'failed';
+          throw new Error(err.message);
+        }));
+    Promise.all(promises).finally(() => setTimeout(checkForNewPosts, 5000));
   };
 
   checkForNewPosts();
+  setTimeout(checkForNewPosts, 5000);
 };

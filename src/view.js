@@ -5,6 +5,7 @@ export default (state, i18nInstance) => {
     input: document.querySelector('#url-input'),
     outputText: document.querySelector('.feedback'),
     button: document.querySelector('#url-submit-button'),
+    form: document.querySelector('form.rss-form'),
     posts: document.querySelector('.posts'),
     feeds: document.querySelector('.feeds'),
     modalTitle: document.querySelector('.modal-title'),
@@ -28,7 +29,7 @@ export default (state, i18nInstance) => {
       const li = document.createElement('li');
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'aling-items-start', 'border-0', 'border-end-0');
       const a = document.createElement('a');
-      if (state.readPosts.includes(post.id)) {
+      if (state.readPostsIds.has(post.id)) {
         a.classList.add('fw-normal');
       } else {
         a.classList.add('fw-bold');
@@ -84,14 +85,15 @@ export default (state, i18nInstance) => {
 
   const watchedState = onChange(state, (path, value) => {
     if (path === 'modalPost') {
-      const post = state.posts.filter((item) => item.id === value)[0];
-      elements.modalTitle.textContent = post.title;
-      elements.modalBody.textContent = post.description;
-      elements.modalLink.setAttribute('href', post.link);
+      const { title, description, link } = state.modalPost;
+      elements.modalTitle.textContent = title;
+      elements.modalBody.textContent = description;
+      elements.modalLink.setAttribute('href', link);
       watchedState.state = 'loaded';
     }
     if (path === 'state') {
       if (value === 'failed') {
+        elements.input.focus();
         elements.input.classList.add('is-invalid');
         elements.button.classList.remove('disabled');
         elements.outputText.textContent = i18nInstance.t(watchedState.error);
@@ -105,6 +107,8 @@ export default (state, i18nInstance) => {
         watchedState.state = 'rendered';
       }
       if (value === 'loaded') {
+        elements.form.reset();
+        elements.input.focus();
         elements.input.classList.remove('is-invalid');
         elements.button.classList.remove('disabled');
         elements.outputText.textContent = i18nInstance.t('success');
