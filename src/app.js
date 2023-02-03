@@ -1,10 +1,10 @@
 import i18next from 'i18next';
-import ru from './locales/ru.js';
 import _ from 'lodash';
+import axios from 'axios';
 import * as yup from 'yup';
+import ru from './locales/ru.js';
 import view from './view.js';
 import parse from './parser.js';
-import axios from 'axios';
 
 const setIds = (data) => {
   const feedId = _.uniqueId();
@@ -23,7 +23,7 @@ const generateURL = (link) => {
 
 const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
   .catch(() => {
-    throw new Error('Network error');
+    throw new Error('networkError');
   })
   .then((response) => {
     const parsedData = parse(response.data.contents);
@@ -33,17 +33,7 @@ const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
     throw new Error(e.message);
   });
 
-  export default () => {
-    const createi18nextInstance = (lng = 'ru') => {
-      const i18nextInstance = i18next.createInstance();
-      Promise.resolve(i18nextInstance.init({
-        lng,
-        resources: { ru },
-      }));
-      return i18nextInstance;
-    };
-    i18nextInstance = createi18nextInstance();
-  
+export default () => {
   const intialState = {
     state: 'intial',
     error: '',
@@ -81,10 +71,9 @@ const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
 
     schema.notOneOf(state.links).validate(inputURL)
       .then(() => {
-        e.target.reset();
-        e.target.elements.url.focus();
+        state.state = 'loading';
+        return getFeedsPostsFromURL(inputURL);
       })
-      .then(() => getFeedsPostsFromURL(inputURL))
       .then((normalizedData) => {
         state.feeds.unshift(normalizedData.feed);
         state.posts.unshift(...normalizedData.posts);
@@ -126,7 +115,5 @@ const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
         }));
     Promise.all(promises).finally(() => setTimeout(checkForNewPosts, 5000));
   };
-
-  checkForNewPosts();
   setTimeout(checkForNewPosts, 5000);
 };

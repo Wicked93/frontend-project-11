@@ -1,13 +1,13 @@
 export default {
-    translation: {
-      invalidUrl: 'Ссылка должна быть валидным URL',
-      duplicate: 'RSS уже существует',
-      required: 'Не должно быть пустым',
-      success: 'RSS успешно загружен',
-      networkError: 'Ошибка сети',
-      rssError: 'Ресурс не содержит валидный RSS',
-      posts: 'Посты',
-      postsButton: 'Просмотр',
-      feeds: 'Фиды',
-    },
-  };
+  translation: {
+    invalidUrl: 'РЎСЃС‹Р»РєР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РІР°Р»РёРґРЅС‹Рј URL',
+    duplicate: 'RSS СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚',
+    required: 'РќРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј',
+    success: 'RSS СѓСЃРїРµС€РЅРѕ Р·Р°РіСЂСѓР¶РµРЅ',
+    networkError: 'РћС€РёР±РєР° СЃРµС‚Рё',
+    rssError: 'Р РµСЃСѓСЂСЃ РЅРµ СЃРѕРґРµСЂР¶РёС‚ РІР°Р»РёРґРЅС‹Р№ RSS',
+    posts: 'РџРѕСЃС‚С‹',
+    postsButton: 'РџСЂРѕСЃРјРѕС‚СЂ',
+    feeds: 'Р¤РёРґС‹',
+  },
+};
