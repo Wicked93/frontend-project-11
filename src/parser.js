@@ -2,7 +2,7 @@ const parseToHTML = (data) => {
   const parser = new DOMParser();
   const parsedData = parser.parseFromString(data, 'application/xml');
   const errorNode = parsedData.querySelector('parsererror');
-  if (errorNode) throw new Error("rssError");
+  if (errorNode) throw new Error('rssError');
   return parsedData;
 };
 
