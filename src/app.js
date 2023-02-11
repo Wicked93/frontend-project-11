@@ -96,6 +96,7 @@ export default () => {
     state.readPostsIds.add(id);
     const { title, description, link } = state.posts.filter((item) => item.id === id)[0];
     state.modalPost = { title, description, link };
+    state.state = 'loaded';
   });
 
   const checkForNewPosts = () => {
