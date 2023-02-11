@@ -89,7 +89,6 @@ export default (state, i18nInstance) => {
       elements.modalTitle.textContent = title;
       elements.modalBody.textContent = description;
       elements.modalLink.setAttribute('href', link);
-      watchedState.state = 'loaded';
     }
     if (path === 'state') {
       if (value === 'failed') {
@@ -103,8 +102,6 @@ export default (state, i18nInstance) => {
       if (value === 'loading') {
         elements.outputText.textContent = '';
         elements.button.classList.add('disabled');
-        watchedState.error = '';
-        watchedState.state = 'rendered';
       }
       if (value === 'loaded') {
         elements.form.reset();
@@ -118,7 +115,6 @@ export default (state, i18nInstance) => {
         elements.feeds.innerHTML = '';
         renderPosts(watchedState, elements);
         renderFeeds(watchedState, elements);
-        watchedState.state = 'rendered';
       }
     }
   });

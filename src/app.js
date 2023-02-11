@@ -72,6 +72,8 @@ export default () => {
     schema.notOneOf(state.links).validate(inputURL)
       .then(() => {
         state.state = 'loading';
+        state.error = '';
+        state.state = 'rendered';
         return getFeedsPostsFromURL(inputURL);
       })
       .then((normalizedData) => {
@@ -79,6 +81,7 @@ export default () => {
         state.posts.unshift(...normalizedData.posts);
         state.links.unshift(inputURL);
         state.state = 'loaded';
+        state.state = 'rendered';
       })
       .catch((err) => {
         state.error = err.message;
@@ -106,6 +109,7 @@ export default () => {
           if (currentNewPosts.length > 0) {
             state.posts.unshift(...currentNewPosts);
             state.state = 'loaded';
+            state.state = 'rendered';
           }
         })
         .catch((err) => {
