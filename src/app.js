@@ -14,6 +14,8 @@ const setIds = (data) => {
   return { feed, posts };
 };
 
+const timeOut = 500;
+
 const generateURL = (link) => {
   const url = new URL('https://allorigins.hexlet.app/get');
   url.searchParams.append('disableCache', 'true');
@@ -73,7 +75,6 @@ export default () => {
       .then(() => {
         state.state = 'loading';
         state.error = '';
-        state.state = 'rendered';
         return getFeedsPostsFromURL(inputURL);
       })
       .then((normalizedData) => {
@@ -81,7 +82,6 @@ export default () => {
         state.posts.unshift(...normalizedData.posts);
         state.links.unshift(inputURL);
         state.state = 'loaded';
-        state.state = 'rendered';
       })
       .catch((err) => {
         state.error = err.message;
@@ -110,7 +110,6 @@ export default () => {
           if (currentNewPosts.length > 0) {
             state.posts.unshift(...currentNewPosts);
             state.state = 'loaded';
-            state.state = 'rendered';
           }
         })
         .catch((err) => {
@@ -118,7 +117,7 @@ export default () => {
           state.state = 'failed';
           throw new Error(err.message);
         }));
-    Promise.all(promises).finally(() => setTimeout(checkForNewPosts, 5000));
+    Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
   };
-  setTimeout(checkForNewPosts, 5000);
+  setTimeout(checkForNewPosts, timeOut);
 };
