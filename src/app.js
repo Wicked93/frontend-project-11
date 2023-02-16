@@ -14,7 +14,7 @@ const setIds = (data) => {
   return { feed, posts };
 };
 
-const timeOut = 500;
+const timeOut = 5000;
 
 const generateURL = (link) => {
   const url = new URL('https://allorigins.hexlet.app/get');
@@ -44,9 +44,9 @@ export default () => {
     posts: [],
     readPostsIds: new Set(),
     modalPost: {
-      title,
-      description,
-      link
+      title: '',
+      description: '',
+      link: '',
     },
   };
 
@@ -123,5 +123,5 @@ export default () => {
         }));
     Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
   };
-  setTimeout(checkForNewPosts, timeOut);
+  checkForNewPosts();
 };
