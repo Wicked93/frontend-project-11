@@ -43,7 +43,11 @@ export default () => {
     feeds: [],
     posts: [],
     readPostsIds: new Set(),
-    modalPost: {},
+    modalPost: {
+      title,
+      description,
+      link
+    },
   };
 
   const i18nextInstance = i18next.createInstance();
