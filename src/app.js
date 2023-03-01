@@ -24,9 +24,15 @@ const generateURL = (link) => {
 };
 
 const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
+  .catch(() => {
+    throw new Error('networkError');
+  })
   .then((response) => {
     const parsedData = parse(response.data.contents);
     return setIds(parsedData);
+  })
+  .catch((e) => {
+    throw new Error(e.message);
   });
 
 export default () => {
