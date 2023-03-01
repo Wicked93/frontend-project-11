@@ -69,12 +69,7 @@ export default () => {
   });
 
   const schema = yup.string().url().required();
-
-  const form = document.querySelector('form.rss-form');
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const inputURL = (e.target.elements.url.value).trim();
-
+  const validate = (state, inputURL) => {
     schema.notOneOf(state.links).validate(inputURL)
       .then(() => {
         state.state = 'loading';
@@ -91,6 +86,13 @@ export default () => {
         state.error = err.message;
         state.state = 'failed';
       });
+  };
+  
+  const form = document.querySelector('form.rss-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const inputURL = (e.target.elements.url.value).trim();
+    validate(state, inputURL);
   });
 
   const postsContainer = document.querySelector('.posts');
