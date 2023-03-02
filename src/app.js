@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import i18next from 'i18next';
 import _ from 'lodash';
 import axios from 'axios';
@@ -24,9 +25,6 @@ const generateURL = (link) => {
 };
 
 const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
-  .catch(() => {
-    throw new Error('networkError');
-  })
   .then((response) => {
     const parsedData = parse(response.data.contents);
     return setIds(parsedData);
@@ -44,9 +42,7 @@ export default () => {
     posts: [],
     readPostsIds: new Set(),
     modalPost: {
-      title: '',
-      description: '',
-      link: '',
+      postId: '',
     },
   };
 
@@ -69,25 +65,25 @@ export default () => {
   });
 
   const schema = yup.string().url().required();
-  const validate = (state, inputURL) => {
-    schema.notOneOf(state.links).validate(inputURL)
+  const validate = (checkingState, inputURL) => {
+    schema.notOneOf(checkingState.links).validate(inputURL)
       .then(() => {
-        state.state = 'loading';
-        state.error = '';
+        checkingState.state = 'loading';
+        checkingState.error = '';
         return getFeedsPostsFromURL(inputURL);
       })
       .then((normalizedData) => {
-        state.feeds.unshift(normalizedData.feed);
-        state.posts.unshift(...normalizedData.posts);
-        state.links.unshift(inputURL);
-        state.state = 'loaded';
+        checkingState.feeds.unshift(normalizedData.feed);
+        checkingState.posts.unshift(...normalizedData.posts);
+        checkingState.links.unshift(inputURL);
+        checkingState.state = 'loaded';
       })
       .catch((err) => {
-        state.error = err.message;
-        state.state = 'failed';
+        checkingState.error = err.message;
+        checkingState.state = 'failed';
       });
   };
-  
+
   const form = document.querySelector('form.rss-form');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -100,8 +96,7 @@ export default () => {
     const { id } = e.target.dataset;
     if (!id) return;
     state.readPostsIds.add(id);
-    const { title, description, link } = state.posts.filter((item) => item.id === id)[0];
-    state.modalPost = { title, description, link };
+    state.modalPost.postId = id;
     state.state = 'loading';
     state.state = 'loaded';
   });
