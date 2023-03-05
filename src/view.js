@@ -84,11 +84,14 @@ export default (state, i18nInstance) => {
   };
 
   const watchedState = onChange(state, (path, value) => {
-    if (path === 'modalPost') {
-      const { title, description, link } = state.modalPost;
+    if (path === 'modalPost.postId') {
+      const elementId = state.modalPost.postId;
+      console.log(path, state);
+      const { title, description, link } = state.posts.filter((item) => item.id === elementId)[0];
       elements.modalTitle.textContent = title;
       elements.modalBody.textContent = description;
       elements.modalLink.setAttribute('href', link);
+      console.log(elements, state.posts.filter((item) => item.id === elementId)[0]);
     }
     if (path === 'state') {
       if (value === 'failed') {
@@ -115,6 +118,7 @@ export default (state, i18nInstance) => {
         elements.feeds.innerHTML = '';
         renderPosts(watchedState, elements);
         renderFeeds(watchedState, elements);
+        console.log(state, path);
       }
     }
   });

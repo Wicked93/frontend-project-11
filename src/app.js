@@ -25,6 +25,9 @@ const generateURL = (link) => {
 };
 
 const getFeedsPostsFromURL = (link) => axios.get(generateURL(link))
+  .catch(() => {
+    throw new Error('networkError');
+  })
   .then((response) => {
     const parsedData = parse(response.data.contents);
     return setIds(parsedData);
@@ -66,7 +69,9 @@ export default () => {
 
   const schema = yup.string().url().required();
   const validate = (checkingState, inputURL) => {
-    schema.notOneOf(checkingState.links).validate(inputURL)
+    const links = checkingState.feeds.map((feed, []) => feed.link);
+    console.log(links);
+    schema.notOneOf(links).validate(inputURL)
       .then(() => {
         checkingState.state = 'loading';
         checkingState.error = '';
@@ -74,8 +79,8 @@ export default () => {
       })
       .then((normalizedData) => {
         checkingState.feeds.unshift(normalizedData.feed);
+        checkingState.feeds[0].link = inputURL;
         checkingState.posts.unshift(...normalizedData.posts);
-        checkingState.links.unshift(inputURL);
         checkingState.state = 'loaded';
       })
       .catch((err) => {
@@ -102,8 +107,8 @@ export default () => {
   });
 
   const checkForNewPosts = () => {
-    const promises = state.links
-      .map((link, index) => getFeedsPostsFromURL(link)
+    const promises = state.feeds
+      .map((feed, index) => getFeedsPostsFromURL(feed.link)
         .then((response) => {
           const { feedId } = state.feeds[index];
           const filteredPosts = state.posts.filter((post) => post.feedId === feedId);
