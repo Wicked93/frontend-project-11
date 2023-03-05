@@ -40,7 +40,6 @@ export default () => {
   const intialState = {
     state: 'intial',
     error: '',
-    links: [],
     feeds: [],
     posts: [],
     readPostsIds: new Set(),
@@ -69,8 +68,7 @@ export default () => {
 
   const schema = yup.string().url().required();
   const validate = (checkingState, inputURL) => {
-    const links = checkingState.feeds.map((feed, []) => feed.link);
-    console.log(links);
+    const links = checkingState.feeds.map((feed) => feed.link);
     schema.notOneOf(links).validate(inputURL)
       .then(() => {
         checkingState.state = 'loading';
