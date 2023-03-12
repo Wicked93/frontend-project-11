@@ -90,6 +90,17 @@ export default (state, i18nInstance) => {
       elements.modalTitle.textContent = title;
       elements.modalBody.textContent = description;
       elements.modalLink.setAttribute('href', link);
+      elements.form.reset();
+      elements.input.focus();
+      elements.input.classList.remove('is-invalid');
+      elements.button.classList.remove('disabled');
+      elements.outputText.textContent = i18nInstance.t('success');
+      elements.outputText.classList.remove('text-danger');
+      elements.outputText.classList.add('text-success');
+      elements.posts.innerHTML = '';
+      elements.feeds.innerHTML = '';
+      renderPosts(watchedState, elements);
+      renderFeeds(watchedState, elements);
     }
     if (path === 'state') {
       if (value === 'failed') {

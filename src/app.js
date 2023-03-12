@@ -105,7 +105,6 @@ export default () => {
         if (!id) return;
         state.readPostsIds.add(id);
         state.modalPost.postId = id;
-        state.state = 'loading';
         state.state = 'loaded';
       });
 
