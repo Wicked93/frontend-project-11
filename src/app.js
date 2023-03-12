@@ -43,11 +43,11 @@ const handleError = (error) => {
 export default () => {
   yup.setLocale({
     mixed: {
-      notOneOf: 'duplicate',
-      required: 'required',
+      notOneOf: () => ({ key: 'duplicate' }),
+      required: () => ({ key: 'required' }),
     },
     string: {
-      url: 'invalidUrl',
+      url: () => ({ key: 'invalidUrl' }),
     },
   });
 
@@ -125,7 +125,7 @@ export default () => {
             .catch((err) => {
               state.error = err.message;
               state.state = 'failed';
-              throw new Error(err.message);
+              console.log(new Error(err.message));
             }));
         Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
       };

@@ -7,7 +7,7 @@ const parseToHTML = (data) => {
     const error = new Error(errorText.textContent);
     error.isParsingError = true;
     throw error;
-  };
+  }
   return parsedData;
 };
 
