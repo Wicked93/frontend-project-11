@@ -67,68 +67,68 @@ export default () => {
     lng: 'ru',
     resources: { ru },
   })
-  .then(() => {
-    const state = view(intialState, i18nextInstance);
-    const makeSchema = (validatedLinks) => yup.string()
-      .required()
-      .url()
-      .notOneOf(validatedLinks);
+    .then(() => {
+      const state = view(intialState, i18nextInstance);
+      const makeSchema = (validatedLinks) => yup.string()
+        .required()
+        .url()
+        .notOneOf(validatedLinks);
 
-    const form = document.querySelector('form.rss-form');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const links = state.feeds.map((feed) => feed.link);
-      const schema = makeSchema(links);
-      const formData = new FormData(e.target);
-      const inputURL = formData.get('url');
-      schema.validate(inputURL)
-        .then(() => {
-          state.state = 'loading';
-          state.error = null;
-          return getFeedsPostsFromURL(inputURL);
-        })
-        .then((normalizedData) => {
-          state.feeds.unshift(normalizedData.feed);
-          state.feeds[0].link = inputURL;
-          state.posts.unshift(...normalizedData.posts);
-          state.state = 'loaded';
-        })
-        .catch((error) => {
-          state.error = handleError(error);
-          state.state = 'failed';
-        });
-    });
-
-    const postsContainer = document.querySelector('.posts');
-    postsContainer.addEventListener('click', (e) => {
-      const { id } = e.target.dataset;
-      if (!id) return;
-      state.readPostsIds.add(id);
-      state.modalPost.postId = id;
-      state.state = 'loading';
-      state.state = 'loaded';
-    });
-
-    const checkForNewPosts = () => {
-      const promises = state.feeds
-        .map((feed, index) => getFeedsPostsFromURL(feed.link)
-          .then((response) => {
-            const { feedId } = state.feeds[index];
-            const filteredPosts = state.posts.filter((post) => post.feedId === feedId);
-            const currentNewPosts = _.differenceBy(response.posts, filteredPosts, 'title')
-              .map((post) => ({ feedId, id: _.uniqueId, ...post }));
-            if (currentNewPosts.length > 0) {
-              state.posts.unshift(...currentNewPosts);
-              state.state = 'loaded';
-            }
+      const form = document.querySelector('form.rss-form');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const links = state.feeds.map((feed) => feed.link);
+        const schema = makeSchema(links);
+        const formData = new FormData(e.target);
+        const inputURL = formData.get('url');
+        schema.validate(inputURL)
+          .then(() => {
+            state.state = 'loading';
+            state.error = null;
+            return getFeedsPostsFromURL(inputURL);
           })
-          .catch((err) => {
-            state.error = err.message;
+          .then((normalizedData) => {
+            state.feeds.unshift(normalizedData.feed);
+            state.feeds[0].link = inputURL;
+            state.posts.unshift(...normalizedData.posts);
+            state.state = 'loaded';
+          })
+          .catch((error) => {
+            state.error = handleError(error);
             state.state = 'failed';
-            throw new Error(err.message);
-          }));
-      Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
-    };
-    checkForNewPosts();
-  });
+          });
+      });
+
+      const postsContainer = document.querySelector('.posts');
+      postsContainer.addEventListener('click', (e) => {
+        const { id } = e.target.dataset;
+        if (!id) return;
+        state.readPostsIds.add(id);
+        state.modalPost.postId = id;
+        state.state = 'loading';
+        state.state = 'loaded';
+      });
+
+      const checkForNewPosts = () => {
+        const promises = state.feeds
+          .map((feed, index) => getFeedsPostsFromURL(feed.link)
+            .then((response) => {
+              const { feedId } = state.feeds[index];
+              const filteredPosts = state.posts.filter((post) => post.feedId === feedId);
+              const currentNewPosts = _.differenceBy(response.posts, filteredPosts, 'title')
+                .map((post) => ({ feedId, id: _.uniqueId, ...post }));
+              if (currentNewPosts.length > 0) {
+                state.posts.unshift(...currentNewPosts);
+                state.state = 'loaded';
+              }
+            })
+            .catch((err) => {
+              state.error = err.message;
+              state.state = 'failed';
+              throw new Error(err.message);
+            }));
+        Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
+      };
+      checkForNewPosts();
+    });
 };

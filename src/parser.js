@@ -2,8 +2,8 @@ const parseToHTML = (data) => {
   const parser = new DOMParser();
   const parsedData = parser.parseFromString(data, 'application/xml');
   const errorNode = parsedData.querySelector('parsererror');
-  const errorText = errorNode.querySelector('div');
   if (errorNode) {
+    const errorText = errorNode.querySelector('div');
     const error = new Error(errorText.textContent);
     error.isParsingError = true;
     throw error;
