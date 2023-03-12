@@ -8,6 +8,7 @@ const parseToHTML = (data) => {
     error.isParsingError = true;
     throw error;
   };
+  return parsedData;
 };
 
 const getFeed = (parsedData) => {
