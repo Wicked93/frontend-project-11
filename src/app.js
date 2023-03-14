@@ -122,8 +122,6 @@ export default () => {
               }
             })
             .catch((err) => {
-              state.error = err.message;
-              state.state = 'failed';
               console.log(new Error(err.message));
             }));
         Promise.all(promises).finally(() => setTimeout(checkForNewPosts, timeOut));
